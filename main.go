@@ -2,15 +2,18 @@ package main
 
 import (
 	"fmt"
-	"monkey/lexer"
+	"monkey/repl"
+	"os"
+	"os/user"
 )
 
 func main() {
-	input := `=+(){},;`
-	lex := lexer.New(input)
-	tok1 := lex.NextToken()
-	fmt.Printf("Token %#v", tok1)
-
-	tok2 := lex.NextToken()
-	fmt.Printf("Token %#v", tok2)
+	user, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Hello %s! This is the Monkey programming language!\n",
+		user.Username)
+	fmt.Printf("Feel free to type in commands\n")
+	repl.Start(os.Stdin, os.Stdout)
 }
