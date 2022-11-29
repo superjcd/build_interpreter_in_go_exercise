@@ -99,7 +99,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
-		return p.parseLetStatement()
+		return p.parseLetStatement()  
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
@@ -186,17 +186,17 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
-	leftExp := prefix()
+	leftExp := prefix()  // 刚开始是1， 然后变成（1+2）
 
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
-		infix := p.infixParseFns[p.peekToken.Type]
+		infix := p.infixParseFns[p.peekToken.Type]  // 处理加号；
 
 		if infix == nil {
-			return leftExp
+			return leftExp    //  处理1
 		}
 
-		p.nextToken()
-		leftExp = infix(leftExp)  
+		p.nextToken()   // 关键点， curent -> peek, peek -> next
+		leftExp = infix(leftExp)    // 这里会recursice, 第一次会返回 （1 + 2）； 那么在下一次与逆行的时候left 就是（1 + 2）
 	}
 
 	return leftExp
@@ -246,10 +246,10 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	expression := &ast.InfixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
-		Left:     left,
+		Left:     left,  // 1
 	}
-	precedence := p.curPrecedence()
-	p.nextToken()
+	precedence := p.curPrecedence() // 这里非常关键， 会记录最近一次infixExpreesion的优先级
+	p.nextToken()  // 又一次前进了
 	expression.Right = p.parseExpression(precedence) //parseInfixExpression 和 parseExpression互相调用
 	return expression
 }
